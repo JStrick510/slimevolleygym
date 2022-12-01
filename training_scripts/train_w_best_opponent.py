@@ -16,10 +16,10 @@ from shutil import copyfile # keep track of generations
 
 # Settings
 SEED = 17
-NUM_TIMESTEPS = int(1e9)
+NUM_TIMESTEPS = int(1e8)
 EVAL_FREQ = int(1e5)
 EVAL_EPISODES = int(1e2)
-BEST_THRESHOLD = 0.5 # must achieve a mean score above this to replace prev best self
+BEST_THRESHOLD = -0.5 # must achieve a mean score above this to replace prev best self
 
 RENDER_MODE = False # set this to false if you plan on running for full 1000 trials.
 
@@ -30,7 +30,7 @@ class SlimeVolleySelfPlayEnv(slimevolleygym.SlimeVolleyEnv):
   def __init__(self):
     super(SlimeVolleySelfPlayEnv, self).__init__()
     self.policy = self
-    self.best_model_filename = os.path.join(LOGDIR, "best_model.zip")
+    self.best_model_filename = os.path.join(LOGDIR, "opponent_best_model.zip")
     self.best_model = PPO1.load(self.best_model_filename, env=self)
 
   def predict(self, obs): # the policy
