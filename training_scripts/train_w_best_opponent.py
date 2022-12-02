@@ -36,18 +36,22 @@ class SlimeVolleySelfPlayEnv(slimevolleygym.SlimeVolleyEnv):
     self.best_model = PPO1.load(self.best_model_filename, env=self)
     self.baselinePolicy = slimevolleygym.BaselinePolicy()
 
-  def predict(self, obs): # the policy
-    possible_policy = 2
-    picked = np.random.choice(possible_policy, p=[EPSILON, 1-EPSILON])
-    
+    self.possible_policies = [self.best_model, self.baselinePolicy]
+    self.policy_picked = 0
+
+  def predict(self, obs): # the policy 
     action = None
-    if picked == 0:
-      action = self.baselinePolicy.predict(obs)
-    else:
+    if self.policy_picked == 0: # best_model
       action, _ = self.best_model.predict(obs)
+    else: # baseline
+      action = self.baselinePolicy.predict(obs)
     return action
 
   def reset(self):
+    self.policy_picked = 0
+    if EPSILON > 0:
+      self.policy_picked = np.random.choice(len(self.possible_policies), p=[EPSILON, 1-EPSILON])
+
     return super(SlimeVolleySelfPlayEnv, self).reset()
 
 class SelfPlayCallback(EvalCallback):
