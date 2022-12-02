@@ -43,6 +43,14 @@ class PPOPolicy:
     action, state = self.model.predict(obs, deterministic=True)
     return action
 
+A2C = None # from stable_baselines import PPO1 (only load if needed.)
+class A2CPolicy:
+  def __init__(self, path):
+    self.model = A2C.load(path)
+  def predict(self, obs):
+    action, state = self.model.predict(obs, deterministic=True)
+    return action
+
 class RandomPolicy:
   def __init__(self, path):
     self.action_space = gym.spaces.MultiBinary(3)
@@ -97,7 +105,7 @@ def evaluate_multiagent(env, policy0, policy1, render_mode=False, n_trials=1000,
 
 if __name__=="__main__":
 
-  APPROVED_MODELS = ["baseline", "ppo", "ga", "cma", "random"]
+  APPROVED_MODELS = ["baseline", "ppo", "ga", "cma", "random", "ppo_new", "a2c"]
 
   def checkchoice(choice):
     choice = choice.lower()
@@ -111,6 +119,8 @@ if __name__=="__main__":
     "cma": "zoo/cmaes/slimevolley.cma.64.96.best.json",
     "ga": "zoo/ga_sp/ga.json",
     "random": None,
+    "ppo_new": "zoo/new_ppo/best_model.zip",
+    "a2c": "zoo/a2c/best_model.zip",
   }
 
   MODEL = {
@@ -119,6 +129,8 @@ if __name__=="__main__":
     "cma": makeSlimePolicy,
     "ga": makeSlimePolicyLite,
     "random": RandomPolicy,
+    "ppo_new": PPOPolicy,
+    "a2c": A2CPolicy,
   }
 
   parser = argparse.ArgumentParser(description='Evaluate pre-trained agents against each other.')
@@ -166,6 +178,9 @@ if __name__=="__main__":
 
   if c0.startswith("ppo") or c1.startswith("ppo"):
     from stable_baselines import PPO1
+
+  if c0.startswith("a2c") or c1.startswith("a2c"):
+    from stable_baselines import A2C
 
   policy0 = MODEL[c0](path0) # the right agent
   policy1 = MODEL[c1](path1) # the left agent
