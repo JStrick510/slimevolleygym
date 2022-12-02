@@ -23,6 +23,8 @@ BEST_THRESHOLD = -0.5 # must achieve a mean score above this to replace prev bes
 
 RENDER_MODE = False # set this to false if you plan on running for full 1000 trials.
 
+EPSILON = 0.5
+
 LOGDIR = "best_opponent_vs_ppo1"
 
 class SlimeVolleySelfPlayEnv(slimevolleygym.SlimeVolleyEnv):
@@ -32,13 +34,18 @@ class SlimeVolleySelfPlayEnv(slimevolleygym.SlimeVolleyEnv):
     self.policy = self
     self.best_model_filename = os.path.join(LOGDIR, "opponent_best_model.zip")
     self.best_model = PPO1.load(self.best_model_filename, env=self)
+    self.baselinePolicy = slimevolleygym.BaselinePolicy()
 
   def predict(self, obs): # the policy
-    if self.best_model is None:
-      return self.action_space.sample() # return a random action
+    possible_policy = 2
+    picked = np.random.choice(possible_policy, p=[EPSILON, 1-EPSILON])
+    
+    action = None
+    if picked == 0:
+      action = self.baselinePolicy.predict(obs)
     else:
       action, _ = self.best_model.predict(obs)
-      return action
+    return action
 
   def reset(self):
     return super(SlimeVolleySelfPlayEnv, self).reset()
