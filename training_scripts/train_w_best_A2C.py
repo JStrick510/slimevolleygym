@@ -11,6 +11,8 @@ from stable_baselines.ppo1 import PPO1
 from stable_baselines.common.policies import MlpPolicy
 from stable_baselines import logger
 from stable_baselines.common.callbacks import EvalCallback
+from stable_baselines import A2C
+from stable_baselines.bench import Monitor
 
 from shutil import copyfile # keep track of generations
 
@@ -19,11 +21,11 @@ SEED = 17
 NUM_TIMESTEPS = int(1e7)
 EVAL_FREQ = int(1e5)
 EVAL_EPISODES = int(1e2)
-BEST_THRESHOLD = -0.5 # must achieve a mean score above this to replace prev best self
+BEST_THRESHOLD = -0.7 # must achieve a mean score above this to replace prev best self
 
 RENDER_MODE = False # set this to false if you plan on running for full 1000 trials.
 
-LOGDIR = "best_opponent_vs_ppo1"
+LOGDIR = "best_opp_a2c"
 
 class SlimeVolleySelfPlayEnv(slimevolleygym.SlimeVolleyEnv):
   # wrapper over the normal single player env, but loads the best self play model
@@ -87,10 +89,11 @@ def train():
 
   env = SlimeVolleySelfPlayEnv()
   env.seed(SEED)
+  env = Monitor(env, LOGDIR)
 
   # take mujoco hyperparams (but doubled timesteps_per_actorbatch to cover more steps.)
-  model = PPO1(MlpPolicy, env, timesteps_per_actorbatch=4096, clip_param=0.2, entcoeff=0.0, optim_epochs=10,
-                   optim_stepsize=3e-4, optim_batchsize=64, gamma=0.99, lam=0.95, schedule='linear', verbose=2)
+  #model = PPO1(MlpPolicy, env, timesteps_per_actorbatch=4096, clip_param=0.2, entcoeff=0.0, optim_epochs=10,
+                   #optim_stepsize=3e-4, optim_batchsize=64, gamma=0.99, lam=0.95, schedule='linear', verbose=2)
 
   eval_callback = SelfPlayCallback(env,
     best_model_save_path=LOGDIR,
@@ -99,7 +102,11 @@ def train():
     n_eval_episodes=EVAL_EPISODES,
     deterministic=False)
 
+  model = A2C(MlpPolicy, env, verbose=2)
   model.learn(total_timesteps=NUM_TIMESTEPS, callback=eval_callback)
+  #model.save(LOGDIR, "a2c_best")
+
+  #model.learn(total_timesteps=NUM_TIMESTEPS, callback=eval_callback)
 
   model.save(os.path.join(LOGDIR, "final_model")) # probably never get to this point.
 
