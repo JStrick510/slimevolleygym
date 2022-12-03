@@ -105,7 +105,7 @@ def evaluate_multiagent(env, policy0, policy1, render_mode=False, n_trials=1000,
 
 if __name__=="__main__":
 
-  APPROVED_MODELS = ["baseline", "ppo", "ga", "cma", "random", "ppo_new", "a2c"]
+  APPROVED_MODELS = ["baseline", "ppo", "ga", "cma", "random", "ppo_new", "a2c", "ppo_ga"]
 
   def checkchoice(choice):
     choice = choice.lower()
@@ -121,6 +121,7 @@ if __name__=="__main__":
     "random": None,
     "ppo_new": "zoo/new_ppo/best_model.zip",
     "a2c": "zoo/a2c/best_model.zip",
+    "ppo_ga": "zoo/ppo_ga/best_model.zip",
   }
 
   MODEL = {
@@ -131,6 +132,7 @@ if __name__=="__main__":
     "random": RandomPolicy,
     "ppo_new": PPOPolicy,
     "a2c": A2CPolicy,
+    "ppo_ga": PPOPolicy,
   }
 
   parser = argparse.ArgumentParser(description='Evaluate pre-trained agents against each other.')
