@@ -17,14 +17,14 @@ from shutil import copyfile # keep track of generations
 
 # Settings
 SEED = 17
-NUM_TIMESTEPS = int(1e7)
+NUM_TIMESTEPS = int(2e7)
 EVAL_FREQ = int(1e5)
 EVAL_EPISODES = int(1e2)
 BEST_THRESHOLD = -0.5 # must achieve a mean score above this to replace prev best self
 
 RENDER_MODE = False # set this to false if you plan on running for full 1000 trials.
 
-EPSILON = 0
+EPSILON = 0.5
 
 LOGDIR = "best_opponent_ga"
 
