@@ -1,5 +1,10 @@
 # Slime Volleyball Gym Environment
 
+<p align="left">
+  <img width="100%" src="https://otoro.net/img/slimegym/pixel.gif"></img>
+</p>
+
+
 ## Installation
 The program runs on Python 3.7. Install all dependency to do training and evaluation:
 ```sh
